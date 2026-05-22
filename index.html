@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fertirrigación Venturi — Sistema Inteligente de Riego</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green: #4da6ff;   
+  --green2: #2e8fe0; 
+  --dark: #101833;    
+  --dark2: #050a1a;
+  --dark3: #070d1a;
+  --text: #e8f0ff;
+  --muted: #f1f3f6;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--dark);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  overflow-x:hidden;
+}
+
+/* CANVAS PARTICLES */
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* NAVBAR */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:1.2rem 5%;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(3,10,5,0.7);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(0,255,136,0.1);
+  transition:all 0.3s;
+}
+.logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.5rem;
+  letter-spacing:3px;
+  color:var(--green);
+}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:0.8rem;
+  font-weight:500;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  transition:color 0.3s;
+}
+.nav-links a:hover{color:var(--green)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:200}
+.hamburger span{width:24px;height:2px;background:var(--green);transition:all 0.3s;display:block}
+
+/* HERO */
+.hero{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:0 5%;
+  overflow:hidden;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,255,136,0.08);
+  border:1px solid rgba(0,255,136,0.2);
+  border-radius:50px;
+  padding:6px 16px;
+  font-size:0.75rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--green);
+  margin-bottom:2rem;
+  width:fit-content;
+}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.hero h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3.5rem,10vw,9rem);
+  line-height:0.9;
+  letter-spacing:2px;
+  margin-bottom:1.5rem;
+}
+.hero h1 span{
+  color:var(--green);
+  display:block;
+}
+.hero h1 .gold{color:var(--gold)}
+.hero-sub{
+  font-size:clamp(1rem,2vw,1.25rem);
+  color:var(--muted);
+  max-width:600px;
+  line-height:1.7;
+  margin-bottom:3rem;
+}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{
+  padding:1rem 2.5rem;
+  background:var(--green);
+  color:#000;
+  border:none;
+  font-weight:700;
+  font-size:0.85rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  cursor:pointer;
+  border-radius:4px;
+  text-decoration:none;
+  transition:all 0.3s;
+}
+.btn-primary:hover{background:var(--green2);transform:translateY(-2px)}
+.btn-outline{
+  padding:1rem 2.5rem;
+  background:transparent;
+  color:var(--text);
+  border:1px solid rgba(255,255,255,0.2);
+  font-weight:500;
+  font-size:0.85rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  cursor:pointer;
+  border-radius:4px;
+  text-decoration:none;
+  transition:all 0.3s;
+}
+.btn-outline:hover{border-color:var(--green);color:var(--green)}
+.hero-visual{
+  position:absolute;right:-5%;top:50%;transform:translateY(-50%);
+  width:55%;max-width:700px;
+  opacity:0.15;
+  pointer-events:none;
+}
+.hero-scroll{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  color:var(--muted);
+  font-size:0.7rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+}
+.scroll-line{
+  width:1px;height:60px;
+  background:linear-gradient(to bottom,transparent,var(--green));
+  animation:scrollline 2s infinite;
+}
+
+/* STATS BAR */
+.stats-bar{
+  position:relative;z-index:1;
+  background:rgba(0,255,136,0.05);
+  border-top:1px solid rgba(0,255,136,0.15);
+  border-bottom:1px solid rgba(0,255,136,0.15);
+  padding:3rem 5%;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:2rem;
+}
+.stat{text-align:center}
+.stat-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:3.5rem;
+  color:var(--green);
+  line-height:1;
+  display:block;
+}
+.stat-label{
+  font-size:0.75rem;
+  color:var(--muted);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-top:6px;
+}
+
+/* SECTIONS */
+section{position:relative;z-index:1;padding:6rem 5%}
+.section-tag{
+  font-family:'Space Mono',monospace;
+  font-size:0.7rem;
+  color:var(--green);
+  letter-spacing:4px;
+  text-transform:uppercase;
+  margin-bottom:1rem;
+  display:flex;align-items:center;gap:10px;
+}
+.section-tag::before{content:'';width:30px;height:1px;background:var(--green)}
+.section-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.5rem,6vw,5rem);
+  line-height:1;
+  letter-spacing:2px;
+  margin-bottom:1.5rem;
+}
+.section-title span{color:var(--green)}
+
+/* INTRO SPLIT */
+.intro-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4rem;
+  align-items:center;
+  margin-top:3rem;
+}
+.intro-text p{
+  color:var(--muted);
+  line-height:1.8;
+  margin-bottom:1.2rem;
+  font-size:1rem;
+}
+.intro-image{
+  position:relative;
+  border-radius:8px;
+  overflow:hidden;
+  aspect-ratio:4/3;
+}
+.intro-image img{width:100%;height:100%;object-fit:cover;filter:saturate(0.5) brightness(0.7)}
+.intro-image::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,255,136,0.15),transparent);
+  mix-blend-mode:screen;
+}
+
+/* VENTURI DIAGRAM */
+.diagram-section{background:rgba(0,10,5,0.5)}
+.venturi-diagram{
+  margin:3rem auto;
+  max-width:900px;
+}
+.diagram-visual{
+  background:rgba(0,20,10,0.6);
+  border:1px solid rgba(0,255,136,0.2);
+  border-radius:12px;
+  padding:2.5rem;
+  position:relative;
+  overflow:hidden;
+}
+.diagram-visual::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(0,255,136,0.05) 0%,transparent 70%);
+}
+
+/* VENTURI SVG */
+.venturi-svg-wrap{text-align:center;margin-bottom:2rem}
+.diagram-labels{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1rem;
+  margin-top:1.5rem;
+}
+.d-label{
+  text-align:center;
+  padding:1rem;
+  border:1px solid rgba(0,255,136,0.1);
+  border-radius:8px;
+  background:rgba(0,255,136,0.04);
+}
+.d-label strong{
+  display:block;
+  color:var(--green);
+  font-family:'Space Mono',monospace;
+  font-size:0.85rem;
+  margin-bottom:4px;
+}
+.d-label span{font-size:0.75rem;color:var(--muted)}
+
+/* BERNOULLI */
+.formula-box{
+  margin:2rem 0;
+  padding:1.5rem 2rem;
+  background:rgba(245,200,66,0.06);
+  border-left:3px solid var(--gold);
+  border-radius:0 8px 8px 0;
+}
+.formula-box p{
+  font-family:'Space Mono',monospace;
+  font-size:1.1rem;
+  color:var(--gold);
+  margin-bottom:0.5rem;
+}
+.formula-box small{color:var(--muted);font-size:0.8rem}
+
+/* CARDS GRID */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;
+  margin-top:3rem;
+}
+.card{
+  background:rgba(0,20,10,0.6);
+  border:1px solid rgba(0,255,136,0.12);
+  border-radius:12px;
+  padding:2rem;
+  transition:all 0.4s;
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--green),transparent);
+  transform:scaleX(0);
+  transition:transform 0.4s;
+}
+.card:hover::before{transform:scaleX(1)}
+.card:hover{
+  border-color:rgba(0,255,136,0.3);
+  transform:translateY(-4px);
+  background:rgba(0,30,15,0.8);
+}
+.card-icon{
+  width:48px;height:48px;
+  border-radius:8px;
+  background:rgba(0,255,136,0.1);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1.2rem;
+  font-size:1.4rem;
+}
+.card h3{
+  font-size:1.1rem;
+  font-weight:600;
+  margin-bottom:0.7rem;
+  color:var(--text);
+}
+.card p{font-size:0.9rem;color:var(--muted);line-height:1.7}
+
+/* COMPONENTS SECTION */
+.components-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:1.2rem;
+  margin-top:3rem;
+}
+.comp-card{
+  background:rgba(0,15,8,0.8);
+  border:1px solid rgba(0,255,136,0.1);
+  border-radius:10px;
+  padding:1.5rem;
+  display:flex;gap:1rem;align-items:flex-start;
+  transition:all 0.3s;
+}
+.comp-card:hover{border-color:rgba(0,255,136,0.3);background:rgba(0,25,12,0.9)}
+.comp-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2rem;
+  color:rgba(0,255,136,0.3);
+  line-height:1;
+  min-width:40px;
+}
+.comp-info h4{font-size:0.95rem;font-weight:600;margin-bottom:4px;color:var(--text)}
+.comp-info p{font-size:0.82rem;color:var(--muted);line-height:1.6}
+
+/* METHODOLOGY TIMELINE */
+.timeline{
+  margin-top:3rem;
+  position:relative;
+  padding-left:3rem;
+}
+.timeline::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;
+  width:1px;
+  background:linear-gradient(to bottom,var(--green),transparent);
+}
+.t-step{
+  position:relative;
+  margin-bottom:3rem;
+  opacity:0;
+  transform:translateX(-20px);
+  transition:all 0.6s;
+}
+.t-step.visible{opacity:1;transform:translateX(0)}
+.t-dot{
+  position:absolute;left:-3rem;top:4px;
+  width:16px;height:16px;
+  border-radius:50%;
+  background:var(--dark);
+  border:2px solid var(--green);
+  display:flex;align-items:center;justify-content:center;
+}
+.t-dot::after{
+  content:'';width:6px;height:6px;
+  border-radius:50%;background:var(--green);
+}
+.t-step h3{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.6rem;
+  letter-spacing:2px;
+  color:var(--green);
+  margin-bottom:0.5rem;
+}
+.t-step p{font-size:0.9rem;color:var(--muted);line-height:1.7;max-width:600px}
+
+/* COMPARISON TABLE */
+.compare-section{background:rgba(0,5,2,0.8)}
+.compare-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:3rem;
+  font-size:0.9rem;
+}
+.compare-table th{
+  background:rgba(0,255,136,0.1);
+  color:var(--green);
+  padding:1rem 1.2rem;
+  text-align:left;
+  font-family:'Space Mono',monospace;
+  font-size:0.75rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  border-bottom:1px solid rgba(0,255,136,0.2);
+}
+.compare-table td{
+  padding:1rem 1.2rem;
+  border-bottom:1px solid rgba(0,255,136,0.05);
+  color:var(--muted);
+}
+.compare-table tr:hover td{background:rgba(0,255,136,0.03)}
+.compare-table tr.highlight td{color:var(--text)}
+.compare-table tr.highlight td:first-child{color:var(--green);font-weight:600}
+.badge{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:20px;
+  font-size:0.72rem;
+  font-weight:600;
+}
+.badge-green{background:rgba(0,255,136,0.12);color:var(--green)}
+.badge-yellow{background:rgba(245,200,66,0.12);color:var(--gold)}
+.badge-red{background:rgba(255,80,80,0.12);color:#ff6060}
+
+/* ADVANTAGES */
+.adv-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:3rem;
+  margin-top:3rem;
+}
+.adv-col h3{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.8rem;
+  letter-spacing:2px;
+  margin-bottom:1.5rem;
+}
+.adv-col.pros h3{color:var(--green)}
+.adv-col.cons h3{color:#ff6060}
+.adv-item{
+  display:flex;gap:1rem;align-items:flex-start;
+  margin-bottom:1.2rem;
+  padding:1rem;
+  border-radius:8px;
+  transition:background 0.3s;
+}
+.adv-item:hover{background:rgba(0,255,136,0.03)}
+.adv-item.con:hover{background:rgba(255,96,96,0.03)}
+.adv-icon{
+  width:28px;height:28px;
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  font-size:0.9rem;
+}
+.adv-icon.pro{background:rgba(0,255,136,0.1);color:var(--green)}
+.adv-icon.con{background:rgba(255,96,96,0.1);color:#ff6060}
+.adv-item h4{font-size:0.9rem;font-weight:600;margin-bottom:3px;color:var(--text)}
+.adv-item p{font-size:0.82rem;color:var(--muted);line-height:1.6}
+
+/* RESULTS */
+.results-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1.5rem;
+  margin-top:3rem;
+}
+.result-card{
+  background:rgba(0,20,10,0.6);
+  border:1px solid rgba(0,255,136,0.15);
+  border-radius:12px;
+  padding:2rem;
+  text-align:center;
+  transition:all 0.4s;
+}
+.result-card:hover{transform:translateY(-6px);border-color:rgba(0,255,136,0.4)}
+.result-icon{font-size:2.5rem;margin-bottom:1rem;display:block}
+.result-card h3{font-size:1rem;font-weight:600;margin-bottom:0.7rem;color:var(--text)}
+.result-card p{font-size:0.82rem;color:var(--muted);line-height:1.6}
+
+/* FLOW DIAGRAM */
+.flow-diagram{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  flex-wrap:wrap;
+  margin:3rem 0;
+}
+.flow-step{
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;
+  width:130px;
+}
+.flow-circle{
+  width:70px;height:70px;
+  border-radius:50%;
+  background:rgba(0,255,136,0.1);
+  border:1px solid rgba(0,255,136,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;
+  margin-bottom:0.8rem;
+  position:relative;
+  transition:all 0.3s;
+}
+.flow-circle:hover{background:rgba(0,255,136,0.2);transform:scale(1.1)}
+.flow-step span{font-size:0.72rem;color:var(--muted);line-height:1.4}
+.flow-arrow{
+  font-size:1.2rem;
+  color:rgba(0,255,136,0.4);
+  padding:0 0.3rem;
+  padding-bottom:2.5rem;
+}
+
+/* CONCLUSION */
+.conclusion-box{
+  max-width:800px;
+  margin:0 auto;
+  text-align:center;
+  padding:4rem 2rem;
+}
+.conclusion-box .quote{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2rem,5vw,3.5rem);
+  line-height:1.1;
+  letter-spacing:2px;
+  color:var(--text);
+  margin-bottom:2rem;
+}
+.conclusion-box .quote span{color:var(--green)}
+.conclusion-box p{
+  color:var(--muted);
+  line-height:1.8;
+  font-size:1rem;
+  margin-bottom:2rem;
+}
+
+/* RECS */
+.recs-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:1rem;
+  margin-top:2rem;
+}
+.rec-item{
+  padding:1.2rem 1.5rem;
+  border-left:2px solid var(--green);
+  background:rgba(0,255,136,0.03);
+  border-radius:0 8px 8px 0;
+  font-size:0.88rem;
+  color:var(--muted);
+  line-height:1.6;
+}
+.rec-item strong{display:block;color:var(--text);margin-bottom:4px;font-size:0.9rem}
+
+/* FOOTER */
+footer{
+  position:relative;z-index:1;
+  padding:3rem 5%;
+  border-top:1px solid rgba(0,255,136,0.1);
+  text-align:center;
+  color:var(--muted);
+  font-size:0.8rem;
+  letter-spacing:2px;
+}
+footer .f-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2rem;
+  color:var(--green);
+  letter-spacing:6px;
+  margin-bottom:1rem;
+}
+
+/* SCROLL REVEAL */
+.reveal{
+  opacity:0;
+  transform:translateY(40px);
+  transition:opacity 0.8s ease,transform 0.8s ease;
+}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{
+  opacity:0;transform:translateX(-40px);
+  transition:opacity 0.8s ease,transform 0.8s ease;
+}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{
+  opacity:0;transform:translateX(40px);
+  transition:opacity 0.8s ease,transform 0.8s ease;
+}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+
+/* ANIMATIONS */
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+@keyframes scrollline{0%{opacity:0;transform:scaleY(0);transform-origin:top}50%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1);transform-origin:bottom}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+@keyframes rotate3d{0%{transform:rotateY(0deg) rotateX(10deg)}100%{transform:rotateY(360deg) rotateX(10deg)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(0,255,136,0.1)}50%{box-shadow:0 0 40px rgba(0,255,136,0.3)}}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .nav-links{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(3,10,5,0.97);
+    flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:2.5rem;
+    z-index:150;
+  }
+  .nav-links.open{display:flex}
+  .nav-links a{font-size:1.1rem}
+  .hamburger{display:flex}
+  .hero-visual{display:none}
+  .intro-grid{grid-template-columns:1fr}
+  .adv-grid{grid-template-columns:1fr}
+  .flow-arrow{display:none}
+  .flow-diagram{gap:1rem}
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+</div><!-- cierra main-web -->
+
+<style>
+#portada{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    background:var(--dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:opacity 0.8s ease,transform 0.8s ease;
+}
+
+#portada.saliendo{
+    opacity:0;
+    transform:scale(1.05);
+}
+
+#particles-portada{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+}
+
+.portada-content{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    padding:2rem;
+    max-width:1100px;
+    width:100%;
+    animation:fadeInUp 1.2s ease forwards;
+}
+
+@keyframes fadeInUp{
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.portada-logos{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:110%;
+    margin-bottom:1.5rem;
+    position:absolute;
+    top:1.5rem;
+    left:-5%;
+}
+
+.logo-box{
+    width:160px;
+    height:160px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* LOGO IZQUIERDO */
+.logo-box:first-child{
+    margin-left:-3rem;
+}
+
+/* LOGO DERECHO */
+.logo-box:last-child{
+    margin-right:-3rem;
+}
+
+.uni-logo{
+    width:180px;
+    height:180px;
+    object-fit:contain;
+}
+
+.logo-placeholder{
+    display:none;
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    border:2px solid rgba(77,166,255,0.3);
+    align-items:center;
+    justify-content:center;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.3rem;
+    color:var(--green);
+    background:rgba(77,166,255,0.05);
+}
+
+.logo-divider{
+    width:1px;
+    height:70px;
+    background:rgba(77,166,255,0.2);
+}
+
+.portada-uni{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(2rem,4vw,7rem);
+    letter-spacing:4px;
+    color:var(--text);
+    margin-bottom:0.3rem;
+}
+
+.portada-depto{
+    font-size:2rem;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:1.5rem;
+}
+
+.portada-divline{
+    width:80px;
+    height:1px;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        var(--green),
+        transparent
+    );
+    margin:0 auto 1.5rem;
+}
+
+.portada-proyecto{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(3rem,9vw,3rem);
+    line-height:0.9;
+    letter-spacing:3px;
+    margin-bottom:1rem;
+    margin-top:0;
+    color:var(--text);
+}
+
+.portada-proyecto span{
+    color:var(--green);
+}
+
+.portada-integrantes{
+    margin-bottom:1rem;
+    padding:1rem 2rem;
+    border:1px solid rgba(77,166,255,0.15);
+    border-radius:8px;
+    background:rgba(77,166,255,0.04);
+    display:inline-block;
+}
+
+.integrante-label{
+    font-size:0.98rem;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+}
+
+.integrante-nombre{
+    font-size:0.87rem;
+    font-weight:500;
+    color:var(--text);
+    letter-spacing:1px;
+}
+
+.portada-btn{
+    display:block;
+    margin:0 auto;
+    padding:1rem 2.5rem;
+    background:var(--green);
+    color:#000;
+    border:none;
+    border-radius:4px;
+    font-weight:700;
+    font-size:0.85rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all 0.3s;
+    margin-bottom:2rem;
+}
+
+.portada-btn:hover{
+    background:var(--green2);
+    transform:translateY(-2px);
+}
+
+.portada-año{
+    font-family:'Space Mono',monospace;
+    font-size:0.7rem;
+    color:var(--muted);
+    letter-spacing:4px;
+}
+</style>
+
+<body>
+
+<!-- PORTADA -->
+<div id="portada">
+  <canvas id="particles-portada"></canvas>
+  <div class="portada-content">
+    <div class="portada-logos">
+      <div class="logo-box">
+        <img src="Imagen1.png" alt="UACh" class="uni-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="logo-placeholder"><span>UACh</span></div>
+      </div>
+      
+      <div class="logo-box">
+        <img src="Imagen2.png" alt="Depto" class="uni-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="logo-placeholder"><span>DI</span></div>
+      </div>
+    </div>
+    <div class="portada-uni">UNIVERSIDAD AUTÓNOMA CHAPINGO</div>
+    <div class="portada-depto">Departamento de Irrigación</div>
+    <div class="portada-divline"></div>
+    <div class="portada-proyecto">VENTURI PARA<br><span>FERTIRRIGACIÓN</span></div>
+    <div class="portada-integrantes">
+      <div class="integrante-label">DOCENTE:</div>
+      <div class="integrante-nombre">Alejandro Romero Bautista ---- aromeroba@chapingo.com<br><br></div>
+      <div class="integrante-label">INTEGRANTES DEL PROYECTO:</div>
+      <div class="integrante-nombre">Hugo Carranza Silverio ---- al24202646@chapingo.com</div>
+      <div class="integrante-nombre">David Carrillo Ayala ------ al22106239@chapingo.com</div>
+      <div class="integrante-nombre">Anett Sandoval De La O ---- </div>
+      <div class="integrante-nombre">Rafael Malaga Aguanta ---- </div>
+      <div class="integrante-nombre">Adan Alexander Jimenez Lopez ---- </div>
+    </div>
+    <button class="portada-btn" onclick="entrarWeb()">
+      <span>Entrar al Proyecto</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <div class="portada-año">TERMODINAMICA APLICADA A LA INGENIERIA EN IRRIGACION</div>
+  </div>
+</div>
+
+<!-- MAIN WEB -->
+<div id="main-web" style="display:none">
+
+
+  
+<canvas id="particles"></canvas>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="logo">VENTURI<span style="color:var(--text);font-size:0.9rem;letter-spacing:1px"> ·FERTIRRIGACIÓN</span></div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#intro">Intro</a></li>
+    <li><a href="#venturi">Venturi</a></li>
+    <li><a href="#componentes">Componentes</a></li>
+    <li><a href="#metodologia">Metodología</a></li>
+    <li><a href="#resultados">Resultados</a></li>
+    <li><a href="#conclusion">Conclusión</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span></span> Proyecto de Irrigación Tecnificada
+  </div>
+  <h1>
+    FERTIRRI<span>GACIÓN</span>
+    
+  </h1>
+  <p class="hero-sub">Sistema de aplicación de agua y fertilizantes mediante inyector Venturi — eficiente, económico y de alta uniformidad para cultivos tecnificados.</p>
+  <div class="hero-btns">
+    <a href="#intro" class="btn-primary">Explorar Proyecto</a>
+    <a href="#venturi" class="btn-outline">Ver Principio Venturi</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    SCROLL
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar reveal">
+  <div class="stat"><span class="stat-num">30%</span><div class="stat-label">Reducción tiempo desarrollo</div></div>
+  <div class="stat"><span class="stat-num">60%</span><div class="stat-label">Ahorro de agua potencial</div></div>
+  <div class="stat"><span class="stat-num">100+</span><div class="stat-label">Años de datos inbred (desde 1920)</div></div>
+  <div class="stat"><span class="stat-num">0</span><div class="stat-label">Energía extra requerida</div></div>
+</div>
+
+<!-- INTRO -->
+<section id="intro">
+  <div class="section-tag">01 — Introducción</div>
+  <div class="section-title reveal">¿QUÉ ES LA<br><span>FERTIRRIGACIÓN?</span></div>
+  <div class="intro-grid">
+    <div class="intro-text reveal-left">
+      <p>La fertirrigación es la aplicación simultánea de agua y fertilizantes a través del sistema de riego. Generalmente opera en sistemas presurizados (goteo, micro), llevando los nutrientes directamente a la zona radical del cultivo.</p>
+      <p>Mejora significativamente la eficiencia tanto del riego como de la fertilización, reduciendo pérdidas y optimizando la absorción de nutrientes por las plantas.</p>
+      <p>El riego por goteo — superficial y subsuperficial — incrementa el rendimiento y la eficiencia del uso del agua respecto a métodos tradicionales, usando menor lámina y menor tiempo de riego.</p>
+      <div class="formula-box" style="margin-top:2rem">
+        <p style="font-size:0.85rem;color:var(--green)">Beneficio clave:</p>
+        <p>Nutriente → Raíz = Absorción máxima</p>
+        <small>Aplicación directa en zona radicular vs distribución superficial</small>
+      </div>
+    </div>
+    <div class="reveal-right">
+      <div style="background:rgba(0,20,10,0.6);border:1px solid rgba(0,255,136,0.15);border-radius:12px;padding:2rem">
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--green);margin-bottom:1.5rem">PROBLEMÁTICA</h3>
+        <div style="margin-bottom:1.2rem;padding:1rem;border-left:2px solid rgba(0,255,136,0.3);background:rgba(0,255,136,0.03)">
+          <strong style="color:var(--text);font-size:0.9rem;display:block;margin-bottom:4px">💧 Desperdicio de agua</strong>
+          <p style="font-size:0.82rem;color:var(--muted);line-height:1.6">Sistemas no presurizados tienen menor eficiencia; el goteo optimiza el uso del recurso hídrico.</p>
+        </div>
+        <div style="margin-bottom:1.2rem;padding:1rem;border-left:2px solid rgba(245,200,66,0.3);background:rgba(245,200,66,0.03)">
+          <strong style="color:var(--text);font-size:0.9rem;display:block;margin-bottom:4px">⚠️ Aplicación no uniforme</strong>
+          <p style="font-size:0.82rem;color:var(--muted);line-height:1.6">La uniformidad del fertilizante depende del inyector, disposición de laterales y presión operativa.</p>
+        </div>
+        <div style="padding:1rem;border-left:2px solid rgba(255,96,96,0.3);background:rgba(255,96,96,0.03)">
+          <strong style="color:var(--text);font-size:0.9rem;display:block;margin-bottom:4px">💸 Costos elevados</strong>
+          <p style="font-size:0.82rem;color:var(--muted);line-height:1.6">Bombas dosificadoras y sistemas complejos aumentan el costo inicial significativamente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VENTURI -->
+<section id="venturi" class="diagram-section">
+  <div class="section-tag">02 — Principio Físico</div>
+  <div class="section-title reveal">EFECTO<br><span>VENTURI</span></div>
+  <p class="reveal" style="color:var(--muted);max-width:650px;line-height:1.8">Los inyectores Venturi succionan fertilizante desde un tanque hacia la tubería de riego usando solo la diferencia de presión entre entrada y salida, sin requerir energía adicional.</p>
+
+  <div class="venturi-diagram reveal">
+    <div class="diagram-visual">
+      <div class="venturi-svg-wrap">
+        <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px">
+          <defs>
+            <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#00ff88" opacity="0.7"/>
+            </marker>
+            <linearGradient id="pipe" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0.6"/>
+              <stop offset="100%" style="stop-color:#00cc66;stop-opacity:0.4"/>
+            </linearGradient>
+          </defs>
+          <!-- Pipe body -->
+          <path d="M40 70 L240 70 L310 95 L490 95 L560 70 L760 70 L760 150 L560 150 L490 125 L310 125 L240 150 L40 150 Z" fill="rgba(0,30,15,0.8)" stroke="rgba(0,255,136,0.3)" stroke-width="1.5"/>
+          <!-- Water flow arrows -->
+          <line x1="60" y1="110" x2="200" y2="110" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="8,4" marker-end="url(#arr)" opacity="0.6"/>
+          <line x1="310" y1="110" x2="490" y2="110" stroke="#00ff88" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arr)" opacity="0.9"/>
+          <line x1="580" y1="110" x2="740" y2="110" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="8,4" marker-end="url(#arr)" opacity="0.6"/>
+          <!-- Throat indicator -->
+          <rect x="308" y="88" width="186" height="44" fill="rgba(0,255,136,0.08)" stroke="rgba(0,255,136,0.4)" stroke-width="1" rx="3"/>
+          <!-- Suction tube -->
+          <line x1="400" y1="88" x2="400" y2="30" stroke="rgba(245,200,66,0.6)" stroke-width="2" stroke-dasharray="6,3"/>
+          <rect x="350" y="10" width="100" height="25" rx="4" fill="rgba(245,200,66,0.1)" stroke="rgba(245,200,66,0.4)" stroke-width="1"/>
+          <text x="400" y="27" text-anchor="middle" fill="#f5c842" font-size="10" font-family="Space Mono,monospace">FERTILIZANTE</text>
+          <!-- Arrow succion -->
+          <line x1="400" y1="60" x2="400" y2="92" stroke="rgba(245,200,66,0.8)" stroke-width="2" marker-end="url(#arr)" style="--arr-fill:#f5c842"/>
+          <!-- Labels -->
+          <text x="140" y="185" text-anchor="middle" fill="#7a9980" font-size="11" font-family="Inter,sans-serif">ENTRADA</text>
+          <text x="140" y="197" text-anchor="middle" fill="#7a9980" font-size="9" font-family="Space Mono,monospace">P↑ V↓</text>
+          <text x="400" y="185" text-anchor="middle" fill="#00ff88" font-size="11" font-family="Inter,sans-serif">GARGANTA</text>
+          <text x="400" y="197" text-anchor="middle" fill="#00ff88" font-size="9" font-family="Space Mono,monospace">P↓↓ V↑↑</text>
+          <text x="660" y="185" text-anchor="middle" fill="#7a9980" font-size="11" font-family="Inter,sans-serif">SALIDA</text>
+          <text x="660" y="197" text-anchor="middle" fill="#7a9980" font-size="9" font-family="Space Mono,monospace">P↑ V↓</text>
+          <!-- Zone labels -->
+          <text x="130" y="65" text-anchor="middle" fill="rgba(0,255,136,0.5)" font-size="9" font-family="Space Mono,monospace">CONVERGENTE</text>
+          <text x="665" y="65" text-anchor="middle" fill="rgba(0,255,136,0.5)" font-size="9" font-family="Space Mono,monospace">DIVERGENTE</text>
+        </svg>
+      </div>
+      <div class="diagram-labels">
+        <div class="d-label"><strong>↑ Velocidad</strong><span>En la garganta el fluido se acelera</span></div>
+        <div class="d-label"><strong>↓ Presión</strong><span>Zona de baja presión genera succión</span></div>
+        <div class="d-label"><strong>⊕ Mezcla</strong><span>Fertilizante succionado se integra</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-box reveal">
+    <p>P + ½ρv² + ρgh = constante (Bernoulli)</p>
+    <small>↑ velocidad → ↓ presión estática → succión de fertilizante desde tanque lateral — sin energía eléctrica adicional</small>
+  </div>
+</section>
+
+<!-- OBJETIVOS -->
+<section id="objetivos">
+  <div class="section-tag">03 — Objetivos</div>
+  <div class="section-title reveal">OBJETIVOS<br><span>DEL PROYECTO</span></div>
+  <div class="cards-grid">
+    <div class="card reveal">
+      <div class="card-icon">🎯</div>
+      <h3>Objetivo General</h3>
+      <p>Diseñar, construir y evaluar un sistema de fertirrigación por goteo con inyector Venturi que aplique agua y fertilizante de forma eficiente y uniforme.</p>
+    </div>
+    <div class="card reveal" style="transition-delay:0.1s">
+      <div class="card-icon">🔬</div>
+      <h3>Hidráulica Venturi</h3>
+      <p>Analizar el comportamiento hidráulico del Venturi (succión, pérdida de carga) bajo distintas condiciones de presión operativa.</p>
+    </div>
+    <div class="card reveal" style="transition-delay:0.2s">
+      <div class="card-icon">📊</div>
+      <h3>Uniformidad</h3>
+      <p>Evaluar la uniformidad de riego y fertirriego con diferentes configuraciones de emisores y disposición de laterales.</p>
+    </div>
+    <div class="card reveal" style="transition-delay:0.3s">
+      <div class="card-icon">💰</div>
+      <h3>Análisis Económico</h3>
+      <p>Comparar el desempeño técnico‑económico del Venturi frente a bombas centrífugas y proporcionales de inyección.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPONENTES -->
+<section id="componentes">
+  <div class="section-tag">04 — Sistema</div>
+  <div class="section-title reveal">COMPONENTES<br><span>DEL SISTEMA</span></div>
+  <p class="reveal" style="color:var(--muted);max-width:600px;line-height:1.8;margin-bottom:1rem">Cada componente cumple una función específica. El diseño integrado de todos ellos determina la eficiencia global del sistema.</p>
+  <div class="components-grid reveal">
+    <div class="comp-card">
+      <div class="comp-num">01</div>
+      <div class="comp-info">
+        <h4>Inyector Venturi</h4>
+        <p>Cuerpo con sección convergente–garganta–divergente y toma de succión lateral. Núcleo del sistema.</p>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-num">02</div>
+      <div class="comp-info">
+        <h4>Bomba de presión</h4>
+        <p>Genera la presión necesaria para el riego y para activar la succión del Venturi sin energía adicional.</p>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-num">03</div>
+      <div class="comp-info">
+        <h4>Tanque fertilizante</h4>
+        <p>Contiene la solución nutritiva que será succionada hacia la línea principal por el efecto de vacío.</p>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-num">04</div>
+      <div class="comp-info">
+        <h4>Goteros / Emisores</h4>
+        <p>Cintas o goteros compensantes (2 L/h). Determinan la uniformidad final de distribución del fertirriego.</p>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-num">05</div>
+      <div class="comp-info">
+        <h4>Red de tuberías</h4>
+        <p>PVC o PE. Transportan el agua y la mezcla fertilizante desde el Venturi hasta cada emisor.</p>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-num">06</div>
+      <div class="comp-info">
+        <h4>Válvulas y manómetros</h4>
+        <p>Control de caudal, cierre y regulación de presión diferencial en entrada y salida del Venturi.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLUJO -->
+<section style="background:rgba(0,5,2,0.8)">
+  <div class="section-tag">05 — Proceso</div>
+  <div class="section-title reveal">FLUJO DE<span><br>FUNCIONAMIENTO</span></div>
+  <div class="flow-diagram reveal">
+    <div class="flow-step">
+      <div class="flow-circle">💧</div>
+      <span>Entrada de agua a presión estable</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-circle">⚡</div>
+      <span>Aceleración en zona convergente</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-circle">🌀</div>
+      <span>Caída de presión en garganta</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-circle">🧪</div>
+      <span>Succión del fertilizante</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-circle">⚗️</div>
+      <span>Mezcla en zona divergente</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="flow-circle">🌱</div>
+      <span>Distribución uniforme a goteros</span>
+    </div>
+  </div>
+</section>
+
+<!-- METODOLOGIA -->
+<section id="metodologia">
+  <div class="section-tag">06 — Metodología</div>
+  <div class="section-title reveal">ETAPAS DEL<br><span>PROYECTO</span></div>
+  <div class="timeline">
+    <div class="t-step">
+      <div class="t-dot"></div>
+      <h3>Diseño</h3>
+      <p>Selección del tamaño de Venturi según presión, caudal y dosis de fertilizante. Definición de disposición de laterales (longitudinal vs. transversal) usando modelos y nomogramas especializados.</p>
+    </div>
+    <div class="t-step">
+      <div class="t-dot"></div>
+      <h3>Ensamble</h3>
+      <p>Instalación del Venturi en línea o en bypass, antes del filtro, con manómetros en entrada y salida para monitoreo continuo de presiones operativas.</p>
+    </div>
+    <div class="t-step">
+      <div class="t-dot"></div>
+      <h3>Pruebas</h3>
+      <p>Medición de presiones, caudal motriz y caudal de succión con agua y soluciones fertilizantes. Registro sistemático de datos bajo distintas condiciones.</p>
+    </div>
+    <div class="t-step">
+      <div class="t-dot"></div>
+      <h3>Ajuste y evaluación</h3>
+      <p>Cálculo de uniformidad de agua y fertilizante (coeficiente de variación, uniformidad de Christiansen). Ajuste de presión, válvulas y tiempo de inyección hasta alcanzar el rango óptimo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARACIÓN -->
+<section id="comparacion" class="compare-section">
+  <div class="section-tag">07 — Comparativa</div>
+  <div class="section-title reveal">VENTURI VS<br><span>OTROS SISTEMAS</span></div>
+  <div class="reveal" style="overflow-x:auto">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Sistema</th>
+          <th>Energía extra</th>
+          <th>Costo inicial</th>
+          <th>Control de dosis</th>
+          <th>Mantenimiento</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight">
+          <td>✅ Inyector Venturi</td>
+          <td><span class="badge badge-green">No requiere</span></td>
+          <td><span class="badge badge-green">Bajo</span></td>
+          <td><span class="badge badge-yellow">Medio (p. diferencial)</span></td>
+          <td><span class="badge badge-green">Fácil</span></td>
+        </tr>
+        <tr>
+          <td>Bomba centrífuga</td>
+          <td><span class="badge badge-red">Sí, eléctrica</span></td>
+          <td><span class="badge badge-red">Alto</span></td>
+          <td><span class="badge badge-green">Alto</span></td>
+          <td><span class="badge badge-yellow">Medio</span></td>
+        </tr>
+        <tr>
+          <td>Bomba proporcional</td>
+          <td><span class="badge badge-yellow">Sí, hidráulica</span></td>
+          <td><span class="badge badge-yellow">Medio–alto</span></td>
+          <td><span class="badge badge-green">Alto, constante</span></td>
+          <td><span class="badge badge-yellow">Especializado</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- VENTAJAS Y LIMITACIONES -->
+<section>
+  <div class="section-tag">08 — Análisis</div>
+  <div class="section-title reveal">VENTAJAS Y<br><span>LIMITACIONES</span></div>
+  <div class="adv-grid">
+    <div class="adv-col pros reveal-left">
+      <h3>✓ Ventajas</h3>
+      <div class="adv-item">
+        <div class="adv-icon pro">✓</div>
+        <div>
+          <h4>Bajo costo</h4>
+          <p>Menor inversión inicial frente a bombas centrífugas y otros inyectores. Económicamente viable por muchos años de operación.</p>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon pro">⚡</div>
+        <div>
+          <h4>Sin energía adicional</h4>
+          <p>Opera con la presión del propio sistema de riego. No requiere conexión eléctrica extra ni componentes electrónicos.</p>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon pro">🔧</div>
+        <div>
+          <h4>Fácil mantenimiento</h4>
+          <p>Operación simple. Compatible con sistemas de goteo de baja presión y con diseños de campo e invernadero.</p>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon pro">🌱</div>
+        <div>
+          <h4>Alta uniformidad</h4>
+          <p>Con diseño adecuado, emisores compensantes y disposición transversal de laterales se logran uniformidades altas.</p>
+        </div>
+      </div>
+    </div>
+    <div class="adv-col cons reveal-right">
+      <h3>✗ Limitaciones</h3>
+      <div class="adv-item con">
+        <div class="adv-icon con">⚠</div>
+        <div>
+          <h4>Dependencia de presión</h4>
+          <p>Cambios en la presión operativa reducen la tasa de succión y pueden afectar la uniformidad de aplicación del fertilizante.</p>
+        </div>
+      </div>
+      <div class="adv-item con">
+        <div class="adv-icon con">📉</div>
+        <div>
+          <h4>Pérdidas de carga</h4>
+          <p>El Venturi introduce pérdida de presión que debe considerarse en el diseño hidráulico de toda la red de distribución.</p>
+        </div>
+      </div>
+      <div class="adv-item con">
+        <div class="adv-icon con">🚫</div>
+        <div>
+          <h4>Riesgo de obstrucciones</h4>
+          <p>Sin buen filtrado y sin fertilizantes de alta solubilidad puede producirse taponamiento de goteros. Requiere mantenimiento preventivo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTADOS -->
+<section id="resultados" style="background:rgba(0,8,3,0.9)">
+  <div class="section-tag">09 — Resultados</div>
+  <div class="section-title reveal">RESULTADOS<br><span>ESPERADOS</span></div>
+  <div class="results-grid">
+    <div class="result-card reveal">
+      <span class="result-icon">🎯</span>
+      <h3>Succión óptima</h3>
+      <p>El Venturi alcanza caudales de succión adecuados, incrementando con la presión hasta alcanzar un punto de operación óptimo.</p>
+    </div>
+    <div class="result-card reveal" style="transition-delay:0.1s">
+      <span class="result-icon">💧</span>
+      <h3>Flujo estable</h3>
+      <p>A caudales motrices superiores al mínimo (>14.6 L/min en algunos equipos), el funcionamiento es estable y predecible.</p>
+    </div>
+    <div class="result-card reveal" style="transition-delay:0.2s">
+      <span class="result-icon">🌾</span>
+      <h3>Mezcla homogénea</h3>
+      <p>Venturi + emisores adecuados logran baja variación en la dosis de fertilizante (bajo coeficiente de variación).</p>
+    </div>
+    <div class="result-card reveal" style="transition-delay:0.3s">
+      <span class="result-icon">📈</span>
+      <h3>Mayor rendimiento</h3>
+      <p>El riego por goteo en maíz y hortalizas muestra mejores rendimientos y relación beneficio/costo frente a sistemas sin presurización.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section id="conclusion">
+  <div class="section-tag">10 — Conclusión</div>
+  <div class="conclusion-box reveal">
+    <div class="quote">LA FERTIRRIGACIÓN POR GOTEO CON VENTURI ES UNA ALTERNATIVA <span>TÉCNICA Y ECONÓMICAMENTE VIABLE</span></div>
+    <p>Los estudios demuestran que un buen diseño geométrico del Venturi, un control adecuado de la presión del sistema y la correcta selección de emisores y disposición de laterales permiten lograr uniformidades altas de riego y fertirriego, con mejoras claras en rendimiento y eficiencia del uso del agua.</p>
+    <a href="#intro" class="btn-primary">↑ Volver al inicio</a>
+  </div>
+</section>
+
+<!-- RECOMENDACIONES -->
+<section style="background:rgba(0,5,2,0.8)">
+  <div class="section-tag">11 — Recomendaciones</div>
+  <div class="section-title reveal">PARA IMPLEMENTAR<br><span>EL SISTEMA</span></div>
+  <div class="recs-grid reveal">
+    <div class="rec-item">
+      <strong>🔍 Limpieza y mantenimiento</strong>
+      Filtrar bien el agua y limpiar periódicamente tuberías y goteros para evitar obstrucciones y pérdida de uniformidad.
+    </div>
+    <div class="rec-item">
+      <strong>🧪 Fertilizantes solubles</strong>
+      Usar formulaciones de alta solubilidad. La concentración y tipo de fertilizante afectan fuertemente la tasa de inyección.
+    </div>
+    <div class="rec-item">
+      <strong>📊 Control de presión</strong>
+      Instalar manómetros en entrada y salida del Venturi y trabajar en el rango óptimo de presión diferencial para maximizar la succión.
+    </div>
+    <div class="rec-item">
+      <strong>📐 Diseño detallado</strong>
+      Seguir modelos, nomogramas y recomendaciones estructurales (ángulos, diámetros, disposición de laterales) para distribución uniforme.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="f-logo">FERTIRRIGACIÓN</div>
+  <p style="margin-bottom:0.5rem">Sistema de Riego por Goteo con Inyector Venturi</p>
+  <p style="font-size:0.72rem;opacity:0.5">Proyecto de Trabajo — Ingeniería Agrícola</p>
+</footer>
+
+<script>
+
+const cp=document.getElementById('particles-portada');
+const ctp=cp.getContext('2d');
+function resizeP(){cp.width=window.innerWidth;cp.height=window.innerHeight}
+resizeP();
+window.addEventListener('resize',resizeP);
+let pp=[];
+class PP{
+  constructor(){this.x=Math.random()*cp.width;this.y=Math.random()*cp.height;this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;this.r=Math.random()*2+0.5;this.a=Math.random()*0.4+0.1;this.c=Math.random()>0.7?'245,200,66':'77,166,255'}
+  update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0)this.x=cp.width;if(this.x>cp.width)this.x=0;if(this.y<0)this.y=cp.height;if(this.y>cp.height)this.y=0}
+  draw(){ctp.beginPath();ctp.arc(this.x,this.y,this.r,0,Math.PI*2);ctp.fillStyle=`rgba(${this.c},${this.a})`;ctp.fill()}
+}
+for(let i=0;i<120;i++)pp.push(new PP());
+function animateP(){
+  ctp.clearRect(0,0,cp.width,cp.height);
+  pp.forEach(p=>{p.update();p.draw()});
+  for(let i=0;i<pp.length;i++)for(let j=i+1;j<pp.length;j++){const dx=pp[i].x-pp[j].x,dy=pp[i].y-pp[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){ctp.beginPath();ctp.moveTo(pp[i].x,pp[i].y);ctp.lineTo(pp[j].x,pp[j].y);ctp.strokeStyle=`rgba(77,166,255,${0.07*(1-d/120)})`;ctp.lineWidth=0.5;ctp.stroke()}}
+  requestAnimationFrame(animateP);
+}
+animateP();
+function entrarWeb(){
+  document.getElementById('portada').classList.add('saliendo');
+  setTimeout(()=>{document.getElementById('portada').style.display='none';document.getElementById('main-web').style.display='block';document.body.style.overflow='auto'},800);
+}
+document.body.style.overflow='hidden';
+
+
+
+
+// PARTICLES
+const canvas=document.getElementById('particles');
+const ctx=canvas.getContext('2d');
+let particles=[];
+let W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();
+window.addEventListener('resize',resize);
+class P{
+  constructor(){
+    this.x=Math.random()*W;
+    this.y=Math.random()*H;
+    this.vx=(Math.random()-0.5)*0.4;
+    this.vy=(Math.random()-0.5)*0.4;
+    this.r=Math.random()*2+0.5;
+    this.a=Math.random()*0.5+0.1;
+    this.c=Math.random()>0.7?'245,200,66':'77,166,255';
+  }
+  update(){
+    this.x+=this.vx;this.y+=this.vy;
+    if(this.x<0)this.x=W;if(this.x>W)this.x=0;
+    if(this.y<0)this.y=H;if(this.y>H)this.y=0;
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${this.c},${this.a})`;
+    ctx.fill();
+  }
+}
+for(let i=0;i<120;i++)particles.push(new P());
+function drawLines(){
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<120){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(0,255,136,${0.08*(1-d/120)})`;
+        ctx.lineWidth=0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{p.update();p.draw()});
+  drawLines();
+  requestAnimationFrame(animate);
+}
+animate();
+
+// SCROLL REVEAL
+const reveals=document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.t-step');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting)e.target.classList.add('visible');
+  });
+},{threshold:0.15});
+reveals.forEach(r=>obs.observe(r));
+
+// NAVBAR scroll
+window.addEventListener('scroll',()=>{
+  const nav=document.getElementById('navbar');
+  nav.style.background=window.scrollY>50?'rgba(3,10,5,0.95)':'rgba(3,10,5,0.7)';
+});
+
+// HAMBURGER
+function toggleMenu(){
+  const links=document.getElementById('navLinks');
+  links.classList.toggle('open');
+}
+document.querySelectorAll('.nav-links a').forEach(a=>{
+  a.addEventListener('click',()=>document.getElementById('navLinks').classList.remove('open'));
+});
+
+// COUNTER ANIMATION
+function animateCounter(el,target,suffix){
+  let start=0;
+  const dur=1500;
+  const step=timestamp=>{
+    if(!start)start=timestamp;
+    const prog=Math.min((timestamp-start)/dur,1);
+    const ease=1-Math.pow(1-prog,3);
+    el.textContent=Math.floor(ease*target)+suffix;
+    if(prog<1)requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+const statObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const nums=e.target.querySelectorAll('.stat-num');
+      nums[0]&&animateCounter(nums[0],30,'%');
+      nums[1]&&animateCounter(nums[1],60,'%');
+      nums[2]&&animateCounter(nums[2],100,'+');
+      statObs.unobserve(e.target);
+    }
+  });
+},{threshold:0.5});
+document.querySelector('.stats-bar')&&statObs.observe(document.querySelector('.stats-bar'));
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
