@@ -830,6 +830,59 @@ footer .f-logo{
     color:var(--muted);
     letter-spacing:4px;
 }
+.hero-flex{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:3rem;
+    width:100%;
+    flex-wrap:wrap;
+}
+
+.hero-text{
+    flex:1;
+    min-width:300px;
+}
+
+.hero-image{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-width:280px;
+}
+
+.hero-image img{
+    width:100%;
+    max-width:500px;
+    object-fit:contain;
+    animation:float 4s ease-in-out infinite;
+    filter:drop-shadow(0 0 25px rgba(77,166,255,0.25));
+}
+.metodo-flex{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:4rem;
+    flex-wrap:wrap;
+}
+
+.metodo-image{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-width:280px;
+}
+
+.metodo-image img{
+    width:100%;
+    max-width:450px;
+    object-fit:contain;
+    border-radius:12px;
+    animation:float 4s ease-in-out infinite;
+    filter:drop-shadow(0 0 25px rgba(77,166,255,0.25));
+}
 </style>
 
 <body>
@@ -859,9 +912,9 @@ footer .f-logo{
       <div class="integrante-label">INTEGRANTES DEL PROYECTO:</div>
       <div class="integrante-nombre">Hugo Carranza Silverio ---- al24202646@chapingo.com</div>
       <div class="integrante-nombre">David Carrillo Ayala ------ al22106239@chapingo.com</div>
-      <div class="integrante-nombre">Anett Sandoval De La O ---- al22106733@chapingo.com</div>
-      <div class="integrante-nombre">Rafael Malaga Aguanta ---- </div>
-      <div class="integrante-nombre">Adan Alexander Jimenez Lopez ---- </div>
+      <div class="integrante-nombre">Aneett Sandoval De La O --- al22106733@chapingo.com</div>
+      <div class="integrante-nombre">Rafael Malaga Aguanta ----- al24202176@chapingo.com</div>
+      <div class="integrante-nombre">Adan A. Jimenez Lopez ----- al24205287@chapingo.com</div>
     </div>
     <button class="portada-btn" onclick="entrarWeb()">
       <span>Entrar al Proyecto</span>
@@ -899,10 +952,19 @@ footer .f-logo{
   <div class="hero-badge">
     <span></span> Proyecto de Irrigación Tecnificada
   </div>
-  <h1>
-    FERTIRRI<span>GACIÓN</span>
-    
-  </h1>
+  <div class="hero-flex">
+
+  <div class="hero-text">
+    <h1>
+      FERTIRRI<span>GACIÓN</span>
+    </h1>
+  </div>
+
+  <div class="hero-image">
+    <img src="Imagen3.png" alt="Sistema Venturi">
+  </div>
+
+  </div>
   <p class="hero-sub">Sistema de aplicación de agua y fertilizantes mediante inyector Venturi — eficiente, económico y de alta uniformidad para cultivos tecnificados.</p>
   <div class="hero-btns">
     <a href="#intro" class="btn-primary">Explorar Proyecto</a>
@@ -1132,32 +1194,63 @@ footer .f-logo{
   </div>
 </section>
 
-<!-- METODOLOGIA -->
+<!-- METODOLOGIA --> 
 <section id="metodologia">
+
   <div class="section-tag">06 — Metodología</div>
-  <div class="section-title reveal">ETAPAS DEL<br><span>PROYECTO</span></div>
-  <div class="timeline">
-    <div class="t-step">
-      <div class="t-dot"></div>
-      <h3>Diseño</h3>
-      <p>Selección del tamaño de Venturi según presión, caudal y dosis de fertilizante. Definición de disposición de laterales (longitudinal vs. transversal) usando modelos y nomogramas especializados.</p>
-    </div>
-    <div class="t-step">
-      <div class="t-dot"></div>
-      <h3>Ensamble</h3>
-      <p>Instalación del Venturi en línea o en bypass, antes del filtro, con manómetros en entrada y salida para monitoreo continuo de presiones operativas.</p>
-    </div>
-    <div class="t-step">
-      <div class="t-dot"></div>
-      <h3>Pruebas</h3>
-      <p>Medición de presiones, caudal motriz y caudal de succión con agua y soluciones fertilizantes. Registro sistemático de datos bajo distintas condiciones.</p>
-    </div>
-    <div class="t-step">
-      <div class="t-dot"></div>
-      <h3>Ajuste y evaluación</h3>
-      <p>Cálculo de uniformidad de agua y fertilizante (coeficiente de variación, uniformidad de Christiansen). Ajuste de presión, válvulas y tiempo de inyección hasta alcanzar el rango óptimo.</p>
-    </div>
+
+  <div class="section-title reveal">
+    ETAPAS DEL<br><span>PROYECTO</span>
   </div>
+
+  <div class="metodo-flex">
+
+    <div class="timeline">
+
+      <div class="t-step">
+        <div class="t-dot"></div>
+        <h3>Diseño</h3>
+        <p>
+          Selección del tamaño de Venturi según presión, caudal y dosis de fertilizante.
+          Definición de disposición de laterales usando modelos y nomogramas especializados.
+        </p>
+      </div>
+
+      <div class="t-step">
+        <div class="t-dot"></div>
+        <h3>Ensamble</h3>
+        <p>
+          Instalación del Venturi en línea o en bypass, antes del filtro,
+          con manómetros en entrada y salida.
+        </p>
+      </div>
+
+      <div class="t-step">
+        <div class="t-dot"></div>
+        <h3>Pruebas</h3>
+        <p>
+          Medición de presiones, caudal motriz y caudal de succión
+          con diferentes condiciones de operación.
+        </p>
+      </div>
+
+      <div class="t-step">
+        <div class="t-dot"></div>
+        <h3>Ajuste y evaluación</h3>
+        <p>
+          Ajuste de presión, válvulas y tiempo de inyección
+          hasta alcanzar el rango óptimo de funcionamiento.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="metodo-image">
+      <img src="Imagen4.png" alt="Metodología del proyecto">
+    </div>
+
+  </div>
+
 </section>
 
 <!-- COMPARACIÓN -->
@@ -1468,14 +1561,6 @@ const statObs=new IntersectionObserver(entries=>{
   });
 },{threshold:0.5});
 document.querySelector('.stats-bar')&&statObs.observe(document.querySelector('.stats-bar'));
-
-
-
-
-
-
-
-
 </script>
 </body>
 </html>
